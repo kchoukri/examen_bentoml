@@ -1,28 +1,67 @@
-# Examen BentoML
+# Examen BentoML — Prédiction d'admission
 
-Ce repertoire contient l'architecture basique afin de rendre l'évaluation pour l'examen BentoML.
+## 1. Présentation
 
-Vous êtes libres d'ajouter d'autres dossiers ou fichiers si vous jugez utile de le faire.
+Ce projet permet de prédire les chances d'admission d'un étudiant à l'aide d'un modèle de régression linéaire déployé avec BentoML et Docker.
 
-Voici comment est construit le dossier de rendu de l'examen:
+L'API dispose de deux endpoints :
+- `/login` : authentification JWT.
+- `/predict` : prédiction sécurisée.
 
-```bash       
-├── examen_bentoml          
-│   ├── data       
-│   │   ├── processed      
-│   │   └── raw           
-│   ├── models      
-│   ├── src       
-│   └── README.md
+## 2. outils
+
+- Docker installé et démarré
+- Python 3 et pip
+- Port 3000 disponible
+
+## 3. Charger l'image Docker
+
+```bash
+docker load -i admission_prediction_service.tar
 ```
 
-Afin de pouvoir commencer le projet vous devez suivre les étapes suivantes:
+## 4. Lancer le service Docker
 
-- Forker le projet sur votre compte github
+```bash
+docker run -d --rm --name admission-api -p 3000:3000 \
+-e API_USERNAME=admin \
+-e API_PASSWORD=exam_bentoml \
+-e JWT_SECRET=secret_test_bentoml_2026 \
+admission_prediction_service:latest serve
+```
 
-- Cloner le projet sur votre machine
+Vérifier que le conteneur fonctionne :
 
-- Récuperer le jeu de données à partir du lien suivant: [Lien de téléchargement]( https://datascientest.s3-eu-west-1.amazonaws.com/examen_bentoml/admissions.csv)
+```bash
+docker ps
+```
 
+L'API est accessible sur `http://localhost:3000`.
 
-Bon travail!
+## 5. Installer les dépendances des tests
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+## 6. Exécuter les tests
+
+Une fois le service démarré :
+
+```bash
+pytest -v
+```
+
+Les tests vérifient :
+- L'authentification valide et invalide
+- Les tokens JWT manquants, invalides ou expirés
+- La prédiction avec un token valide
+- Le rejet des données invalides
+
+## 7. Arrêter le service
+
+```bash
+docker stop admission-api
+```

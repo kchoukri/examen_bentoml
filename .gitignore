@@ -2,3 +2,5 @@
 .DS_Store?
 /venv
 /clean_data.csv
+ .venv/
+  admission_prediction_service.tar
